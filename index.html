@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pedido de Quesadillas</title>
+<style>
+    body { font-family: Arial; padding: 20px; }
+    .item { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Pedido de Quesadillas</h2>
+
+<label>Cantidad (1 a 10):</label>
+<select id="cantidad" onchange="generarOpciones()">
+    <option value="">Selecciona…</option>
+    <script>
+        for (let i = 1; i <= 10; i++) {
+            document.write(`<option value="${i}">${i}</option>`);
+        }
+    </script>
+</select>
+
+<div id="sabores"></div>
+
+<button onclick="enviarWhatsApp()">Enviar a WhatsApp</button>
+
+<script>
+const opciones = [
+    "Queso Oaxaca",
+    "Pollo",
+    "Tinga de Pollo",
+    "Chicharrón",
+    "Papa",
+    "Papa con Chorizo",
+    "Requesón",
+    "Rajas",
+    "Champiñón",
+    "Frijol con Chorizo"
+];
+
+function generarOpciones() {
+    const cant = document.getElementById("cantidad").value;
+    const cont = document.getElementById("sabores");
+    cont.innerHTML = "";
+
+    if (!cant) return;
+
+    for (let i = 1; i <= cant; i++) {
+        let select = `<div class="item">
+            <label>Quesadilla ${i}:</label>
+            <select id="q${i}">
+                <option value="">Selecciona sabor…</option>`;
+        opciones.forEach(o => {
+            select += `<option value="${o}">${o}</option>`;
+        });
+        select += `</select></div>`;
+        cont.innerHTML += select;
+    }
+}
+
+function enviarWhatsApp() {
+    let cant = document.getElementById("cantidad").value;
+    if (!cant) {
+        alert("Selecciona la cantidad primero.");
+        return;
+    }
+
+    let mensaje = `Pedido de ${cant} quesadillas:\n`;
+
+    for (let i = 1; i <= cant; i++) {
+        let sabor = document.getElementById(`q${i}`).value;
+        if (!sabor) {
+            alert(`Selecciona el sabor de la quesadilla ${i}.`);
+            return;
+        }
+        mensaje += `• Quesadilla ${i}: ${sabor}\n`;
+    }
+
+    const numero = "+523338948060"; // ← reemplaza
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+
+    window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
