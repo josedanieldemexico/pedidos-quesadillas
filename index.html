@@ -1,90 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
-<title>Pedido de Quesadillas</title>
+<title>Pedidos</title>
 <style>
-    body { font-family: Arial; padding: 20px; font-size: 300%; }
-    .item { margin-bottom: 10px; }
-    label, select, button { font-size: 1em; }
+    body {
+        font-family: Arial;
+        padding: 20px;
+        background-color: orange;
+        font-size: 2.5rem;
+    }
+    label, select, button {
+        font-size: 2.5rem;
+    }
+    .item { margin-bottom: 20px; }
+    #totalGeneral {
+        margin-top: 40px;
+        font-size: 3rem;
+        font-weight: bold;
+        border-top: 4px solid #000;
+        padding-top: 20px;
+    }
 </style>
 </head>
 <body>
 
 <h2>Pedido de Quesadillas</h2>
 
-<label>Cantidad (1 a 10):</label>
-<select id="cantidad" onchange="generarOpciones()">
+<!-- CANTIDAD QUESADILLAS -->
+<label>Cantidad:</label>
+<select id="cantidadQ" onchange="generarOpcionesQ(); actualizarSubtotalQ(); actualizarTotal();">
     <option value="">Selecciona…</option>
     <script>
+        function precioQ(c) {
+            if (c === 1) return 30;
+            if (c === 2) return 55;
+            if (c === 3) return 75;
+            if (c >= 4) return c * 25;
+        }
         for (let i = 1; i <= 10; i++) {
-            document.write(`<option value="${i}">${i}</option>`);
+            document.write(`<option value="${i}">${i} × $${precioQ(i)} pesos</option>`);
         }
     </script>
 </select>
 
-<div id="sabores"></div>
+<strong id="subtotalQ" style="margin-left:20px;"></strong>
+
+<div id="saboresQ"></div>
+
+
+
+<hr>
+
+<h2>Pedido de Sopes</h2>
+
+<!-- CANTIDAD SOPES -->
+<label>Cantidad:</label>
+<select id="cantidadS" onchange="generarOpcionesS(); actualizarSubtotalS(); actualizarTotal();">
+    <option value="">Selecciona…</option>
+    <script>
+        function precioS(c) {
+            if (c === 1) return 30;
+            if (c === 2) return 55;
+            if (c === 3) return 75;
+            if (c >= 4) return c * 25;
+        }
+        for (let i = 1; i <= 10; i++) {
+            document.write(`<option value="${i}">${i} × $${precioS(i)} pesos</option>`);
+        }
+    </script>
+</select>
+
+<strong id="subtotalS" style="margin-left:20px;"></strong>
+
+<div id="saboresS"></div>
+
+
+<!-- TOTAL GENERAL -->
+<div id="totalGeneral">TOTAL: $0</div>
+
 
 <button onclick="enviarWhatsApp()">Enviar a WhatsApp</button>
 
+
 <script>
-const opciones = [
-    "Queso Oaxaca",
-    "Pollo",
-    "Tinga de Pollo",
-    "Chicharrón",
-    "Papa",
-    "Papa con Chorizo",
-    "Requesón",
-    "Rajas",
-    "Champiñón",
-    "Frijol con Chorizo"
+
+const saboresQ = [
+    "Queso Oaxaca","Pollo","Tinga de Pollo","Chicharrón","Papa",
+    "Papa con Chorizo","Requesón","Rajas","Champiñón","Frijol con Chorizo"
 ];
 
-function generarOpciones() {
-    const cant = document.getElementById("cantidad").value;
-    const cont = document.getElementById("sabores");
-    cont.innerHTML = "";
+const saboresS = [
+    "Sencillo",
+    "Pollo","Tinga","Chicharrón","Papa","Papa con Chorizo",
+    "Queso Oaxaca","Requesón","Rajas","Champiñón"
+];
 
+
+// -------------- QUESADILLAS --------------
+
+function generarOpcionesQ() {
+    const cant = document.getElementById("cantidadQ").value;
+    const cont = document.getElementById("saboresQ");
+    cont.innerHTML = "";
     if (!cant) return;
 
     for (let i = 1; i <= cant; i++) {
-        let select = `<div class="item">
+        let html = `<div class="item">
             <label>Quesadilla ${i}:</label>
-            <select id="q${i}">
+            <select id="q${i}" onchange="actualizarTotal()">
                 <option value="">Selecciona sabor…</option>`;
-        opciones.forEach(o => {
-            select += `<option value="${o}">${o}</option>`;
-        });
-        select += `</select></div>`;
-        cont.innerHTML += select;
+        saboresQ.forEach(s => html += `<option value="${s}">${s}</option>`);
+        html += `</select></div>`;
+        cont.innerHTML += html;
     }
 }
 
-function enviarWhatsApp() {
-    let cant = document.getElementById("cantidad").value;
-    if (!cant) {
-        alert("Selecciona la cantidad primero.");
-        return;
-    }
+function precioQ(c) {
+    if (c == 1) return 30;
+    if (c == 2) return 55;
+    if (c == 3) return 75;
+    if (c >= 4) return c * 25;
+}
 
-    let mensaje = `Pedido de ${cant} quesadillas:\n`;
+function actualizarSubtotalQ() {
+    const cant = Number(document.getElementById("cantidadQ").value);
+    if (!cant) return document.getElementById("subtotalQ").innerText = "";
+    document.getElementById("subtotalQ").innerText = "Subtotal: $" + precioQ(cant);
+}
+
+
+
+// -------------- SOPES --------------
+
+function generarOpcionesS() {
+    const cant = document.getElementById("cantidadS").value;
+    const cont = document.getElementById("saboresS");
+    cont.innerHTML = "";
+    if (!cant) return;
 
     for (let i = 1; i <= cant; i++) {
-        let sabor = document.getElementById(`q${i}`).value;
-        if (!sabor) {
-            alert(`Selecciona el sabor de la quesadilla ${i}.`);
-            return;
-        }
-        mensaje += `• Quesadilla ${i}: ${sabor}\n`;
+        let html = `<div class="item">
+            <label>Sope ${i}:</label>
+            <select id="s${i}" onchange="actualizarSubtotalS(); actualizarTotal();">
+                <option value="">Selecciona sabor…</option>`;
+        saboresS.forEach(s => html += `<option value="${s}">${s}</option>`);
+        html += `</select></div>`;
+        cont.innerHTML += html;
     }
+}
+
+function precioS_base(c) {
+    if (c == 1) return 30;
+    if (c == 2) return 55;
+    if (c == 3) return 75;
+    if (c >= 4) return c * 25;
+}
+
+function actualizarSubtotalS() {
+    const cant = Number(document.getElementById("cantidadS").value);
+    if (!cant) return document.getElementById("subtotalS").innerText = "";
+
+    let total = 0;
+    let todosSencillos = true;
+
+    for (let i = 1; i <= cant; i++) {
+        const val = document.getElementById(`s${i}`).value;
+        if (val !== "Sencillo") todosSencillos = false;
+    }
+
+    if (todosSencillos) {
+        total = cant * 25;
+    } else {
+        total = precioS_base(cant);
+    }
+
+    document.getElementById("subtotalS").innerText = "Subtotal: $" + total;
+}
+
+
+
+// -------------- TOTAL GENERAL --------------
+
+function actualizarTotal() {
+    let tQ = 0;
+    let tS = 0;
+
+    const cantQ = Number(document.getElementById("cantidadQ").value);
+    if (cantQ) tQ = precioQ(cantQ);
+
+    const cantS = Number(document.getElementById("cantidadS").value);
+    if (cantS) {
+        let todosSencillos = true;
+        for (let i = 1; i <= cantS; i++) {
+            const val = document.getElementById(`s${i}`).value;
+            if (val !== "Sencillo" && val !== "") todosSencillos = false;
+        }
+
+        if (todosSencillos) {
+            tS = cantS * 25;
+        } else {
+            tS = precioS_base(cantS);
+        }
+    }
+
+    const total = tQ + tS;
+    document.getElementById("totalGeneral").innerText = `TOTAL: $${total}`;
+}
+
+
+
+// -------------- WHATSAPP --------------
+
+function enviarWhatsApp() {
+    let mensaje = "";
+
+    // QUESADILLAS
+    const cantQ = Number(document.getElementById("cantidadQ").value);
+    if (cantQ) {
+        mensaje += `Quesadillas (${cantQ}): $${precioQ(cantQ)}\n`;
+        for (let i = 1; i <= cantQ; i++) {
+            let sabor = document.getElementById(`q${i}`).value || "(sin sabor elegido)";
+            mensaje += `• Quesadilla ${i}: ${sabor}\n`;
+        }
+        mensaje += "\n";
+    }
+
+    // SOPES
+    const cantS = Number(document.getElementById("cantidadS").value);
+    if (cantS) {
+        mensaje += `Sopes (${cantS})\n`;
+
+        let todosSencillos = true;
+        for (let i = 1; i <= cantS; i++) {
+            let sabor = document.getElementById(`s${i}`).value || "(sin sabor elegido)";
+            mensaje += `• Sope ${i}: ${sabor}\n`;
+            if (sabor !== "Sencillo") todosSencillos = false;
+        }
+
+        let subtotalS = todosSencillos ? cantS * 25 : precioS_base(cantS);
+        mensaje += `Subtotal sopes: $${subtotalS}\n\n`;
+    }
+
+    const total = document.getElementById("totalGeneral").innerText;
+
+    mensaje += `${total}`;
 
     const numero = "+523338948060";
     const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-
     window.open(url, "_blank");
 }
+
 </script>
 
 </body>
